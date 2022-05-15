@@ -6,7 +6,7 @@ module testbench;
   wire trap;
   reg [7:0] cnt;
 
-  twitchcore c (
+  rvcore c (
     .clk (clk),
     .resetn (resetn),
     .trap (trap)
@@ -41,13 +41,11 @@ module testbench;
     resetn <= 0;
   end
 
-
-
   always @(posedge clk) begin
     if (c.step[6] == 1'b1) begin
       $display("%b: %h %d pc:%h -- opcode:%b -- func:%h alt:%d left:%h imm:%h pend:%h d_addr:%h d_data:%h c.rs1:%h c.rs2:%h c.rd:%h",
         c.step, c.i_data, c.resetn, c.pc, c.opcode, c.alu_func, c.alu_alt, c.alu_left, c.alu_imm, c.pend, c.d_addr, c.d_data, c.rs1, c.rs2, c.rd);
-      // foreach (c.regs[i]) $display("regs[%d]:%d", i, c.regs[i]);
+  
       for (int i = 10; i < 18; i = i + 1) $display("regs[%1d]:%2d", i, c.regs[i]);
     end
   end

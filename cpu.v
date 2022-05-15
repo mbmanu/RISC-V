@@ -105,8 +105,8 @@ module ram (
   end
 endmodule
 
-// twitchcore is a low performance RISC-V processor
-module twitchcore (
+// rvcore is a low performance RISC-V processor
+module rvcore (
   input clk, resetn,
   output reg trap,
   output reg [31:0] pc
