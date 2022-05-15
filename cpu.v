@@ -76,22 +76,20 @@ module ram (
   input [31:0] dw_data,
   input [1:0] dw_size);
 
-  // 16 KB
   reg [31:0] mem [0:4095];
   wire [31:0] dt_data = mem[d_addr[13:2]];
 
   always @(posedge clk) begin
-    // always aligned for instruction fetch
     i_data <= mem[i_addr[13:2]];
-    // misaligned data, but it's filled with 0s
-    // support some unaligned loads, but can't break word boundary
+    
     d_data <=
       d_addr[1] ? (d_addr[0] ? (dt_data >> 24) : (dt_data >> 16))
                 : (d_addr[0] ? (dt_data >> 8) : dt_data);
-    // 2'b01 = 8-bit
+    // 2'b00 = 32-bit
+    // 2'b01 = 24-bit
     // 2'b10 = 16-bit
-    // 2'b11 = 32-bit
-    // again, can't break word boundary
+    // 2'b11 = 08-bit
+    //
     case (dw_size)
       2'b11: mem[d_addr[13:2]] <= dw_data;
       2'b10: mem[d_addr[13:2]] <= 
@@ -142,6 +140,7 @@ module rvcore (
   wire [6:0] funct7 = i_data[31:25];
   wire [4:0] rs1 = i_data[19:15];
   wire [4:0] rs2 = i_data[24:20];
+  // Immediate encoding variants
   wire [31:0] imm_i = {{20{i_data[31]}}, i_data[31:20]};
   wire [31:0] imm_s = {{20{i_data[31]}}, i_data[31:25], i_data[11:7]};
   wire [31:0] imm_b = {{19{i_data[31]}}, i_data[31], i_data[7], i_data[30:25], i_data[11:8], 1'b0};
@@ -182,25 +181,6 @@ module rvcore (
     .out (cond_out)
   );
 
-  /*parameter SZ = 4;
-  parameter LOGCNT = 5;
-  parameter BITS = 18;
-  reg [2:0] risk_func;
-  reg [4:0] risk_reg;
-  reg [10+LOGCNT-1:0] risk_addr;
-  reg [10+LOGCNT-2:0] risk_stride_x;
-  reg [10+LOGCNT-2:0] risk_stride_y;
-  wire [BITS*SZ*SZ-1:0] risk_reg_view;
-  risk #(SZ, LOGCNT, BITS) ri (
-    .clk (clk),
-    .risk_func (risk_func),
-    .risk_reg (risk_reg),
-    .risk_addr (risk_addr),
-    .risk_stride_x (risk_stride_x),
-    .risk_stride_y (risk_stride_y),
-    .reg_view (risk_reg_view)
-  );*/
-
   integer i;
   always @(posedge clk) begin
     step <= step << 1;
@@ -229,6 +209,8 @@ module rvcore (
     reg_writeback <= 1'b0;
     do_load <= 1'b0;
     do_store <= 1'b0;
+    
+     // Control unit
     case (opcode)
       7'b0110111: begin // LUI
         alu_imm <= imm_u;
@@ -280,35 +262,11 @@ module rvcore (
         reg_writeback <= 1'b1;
       end
 
-      /*7'b1111111: begin // RISK
-        risk_func <= funct3;
-        risk_addr <= regs[rs1];
-        risk_stride_x <= regs[rs2][31:16];
-        risk_stride_y <= regs[rs2][15:0];
-        risk_reg <= i_data[11:7];
-        // 9 DWORDs
-        case (funct7) 
-          7'b0000000: alu_imm <= risk_reg_view[31:0];
-          7'b0000001: alu_imm <= risk_reg_view[63:32];
-          7'b0000010: alu_imm <= risk_reg_view[95:64];
-          7'b0000011: alu_imm <= risk_reg_view[127:96];
-          7'b0000100: alu_imm <= risk_reg_view[159:128];
-          7'b0000101: alu_imm <= risk_reg_view[191:160];
-          7'b0000110: alu_imm <= risk_reg_view[223:192];
-          7'b0000111: alu_imm <= risk_reg_view[255:224];
-          7'b0001000: alu_imm <= risk_reg_view[288:256];
-        endcase
-        alu_left <= 32'b0;
-        reg_writeback <= 1'b1;
-      end*/
-
       7'b1110011: begin // SYSTEM
         trap <= regs[3] > 0;
       end
     endcase
 
-    // *** Execute (happens above in arith and cond) ***
-    // it sets pend and cond_out here
 
     // *** Memory access ***
     // this sets d_data based on pend
