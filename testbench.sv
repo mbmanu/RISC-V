@@ -47,6 +47,8 @@ module testbench;
     if (c.step[6] == 1'b1) begin
       $display("%b: %h %d pc:%h -- opcode:%b -- func:%h alt:%d left:%h imm:%h pend:%h d_addr:%h d_data:%h c.rs1:%h c.rs2:%h c.rd:%h",
         c.step, c.i_data, c.resetn, c.pc, c.opcode, c.alu_func, c.alu_alt, c.alu_left, c.alu_imm, c.pend, c.d_addr, c.d_data, c.rs1, c.rs2, c.rd);
+      // foreach (c.regs[i]) $display("regs[%d]:%d", i, c.regs[i]);
+      for (int i = 10; i < 18; i = i + 1) $display("regs[%1d]:%2d", i, c.regs[i]);
     end
   end
 
@@ -59,15 +61,8 @@ module testbench;
     int char_0, char_1, char_2, char_3;
     $dumpfile("waves.vcd");
     $dumpvars(0,testbench);
-    #50000
+    #400
     $display("no more work ", cnt);
-    // At the end of risc-v test, we should see OK\n or
-    // Err\n in registers a0-a3 ()
-    char_0 = `hdl_path_regf[10];
-    char_1 = `hdl_path_regf[11];
-    char_2 = `hdl_path_regf[12];
-    char_3 = `hdl_path_regf[13];
-    $display($sformatf("RISC-V TEST Result: %s%s%s%s", char_0, char_1, char_2, char_3));
     $finish;
   end
 endmodule
