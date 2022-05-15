@@ -1,5 +1,4 @@
 `define hdl_path_regf c.regs
-
 module testbench;
 
   reg clk;
@@ -46,8 +45,8 @@ module testbench;
 
   always @(posedge clk) begin
     if (c.step[6] == 1'b1) begin
-      $display("%b: %h %d pc:%h -- opcode:%b -- func:%h left:%h imm:%h pend:%h d_addr:%h d_data:%h trap:%d",
-        c.step, c.i_data, c.resetn, c.pc, c.opcode, c.alu_func, c.alu_left, c.alu_imm, c.pend, c.d_addr, c.d_data, c.trap);
+      $display("%b: %h %d pc:%h -- opcode:%b -- func:%h left:%h imm:%h pend:%h d_addr:%h d_data:%h trap:%d rs1:%h rs2:%h",
+        c.step, c.i_data, c.resetn, c.pc, c.opcode, c.alu_func, c.alu_left, c.alu_imm, c.pend, c.d_addr, c.d_data, c.trap, c.rs1, c.rs2);
     end
   end
 

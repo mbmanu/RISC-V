@@ -1,4 +1,3 @@
-
 module top (
   input clk_i,
   input [3:0] sw, 

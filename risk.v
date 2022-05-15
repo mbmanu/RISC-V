@@ -1,11 +1,3 @@
-// RISK extensions
-// 4x4 registers
-// we have 270 18-bit rams, need this instead of 19. depth is 1024
-// let's make 128 BRAMs, that's 256 elements of read bandwidth
-// 2304-bit wide databus if we only use one port (36864-bit in big chip)
-// this is also the size of ECC
-// use a 9 bit mantissa (cherryfloat)
-
 
 module risk_single_mem #(parameter LINE=18) (
   input clk,
@@ -37,11 +29,7 @@ module risk_mem #(parameter SZ=4, LOGCNT=5, BITS=18) (
 );
   parameter CNT=(1<<LOGCNT);
 
-  // strides
-  //parameter SZ_X=SZ;
-  //parameter LINE=BITS;
 
-  // strideless
   parameter SZ_X=1;
   parameter LINE=BITS*SZ;
 
@@ -98,9 +86,6 @@ module risk_mem #(parameter SZ=4, LOGCNT=5, BITS=18) (
       wire [CNT-1:0] lmask;
       for (i=0; i < CNT; i=i+1) assign lmask[i] = mask[i*SZ_X*SZ + k];
 
-      // https://andy-knowles.github.io/one-hot-mux/
-      // in this chip, this is 16 registers x 32 BRAMs x 18-bits
-      // in final edition, this will be 1024 registers x 2048 BRAMs x 19-bits
       integer l;
       always @(posedge clk) begin
         if (lmask != 'b0) begin
