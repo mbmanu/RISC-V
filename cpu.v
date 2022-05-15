@@ -1,46 +1,36 @@
-
 module alu (
   input clk,
   input [2:0] funct3,
   input [31:0] x,
   input [31:0] y,
+  input alt,
   output reg [31:0] out
 );
   always @(posedge clk) begin
     case (funct3) 
-      3'b000: begin  // ADD
-        out <= x + y;
+      3'b000: begin  // ADDI
+        out <= alt ? (x - y) : (x + y);
       end
-
-      3'b001: begin  // SUB
-        out <= x - y;
+      3'b001: begin  // SLL
+        out <= x << y[4:0];
       end
-
-      3'b010: begin  // NOT
-        out <= !x;
+      3'b010: begin  // SLT
+        out <= {31'b0, $signed(x) < $signed(y)};
       end
-
-      3'b011: begin  // SL
-        out <= x << y;
+      3'b011: begin  // SLTU
+        out <= {31'b0, x < y};
       end
-
-      3'b100: begin  // SR
-        out <= x >> y;
-      end
-
-      3'b101: begin  // XOR
+      3'b100: begin  // XOR
         out <= x ^ y;
       end
-
+      3'b101: begin  // SRL
+        out <= alt ? (x >>> y[4:0]) : (x >> y[4:0]);
+      end
       3'b110: begin  // OR
         out <= x | y;
       end
-
       3'b111: begin  // AND
         out <= x & y;
-      end
-      default: begin
-        out <= 0;
       end
     endcase
   end
@@ -161,6 +151,7 @@ module twitchcore (
   reg [31:0] alu_left;
   reg [31:0] alu_imm;
   reg [2:0] alu_func;
+  reg alu_alt;
 
   wire [31:0] pend;
   reg [2:0] funct3_saved;
@@ -179,6 +170,7 @@ module twitchcore (
     .funct3 (alu_func),
     .x (alu_left),
     .y (alu_imm),
+    .alt (alu_alt),
     .out (pend)
   );
 
@@ -190,7 +182,24 @@ module twitchcore (
     .out (cond_out)
   );
 
-
+  /*parameter SZ = 4;
+  parameter LOGCNT = 5;
+  parameter BITS = 18;
+  reg [2:0] risk_func;
+  reg [4:0] risk_reg;
+  reg [10+LOGCNT-1:0] risk_addr;
+  reg [10+LOGCNT-2:0] risk_stride_x;
+  reg [10+LOGCNT-2:0] risk_stride_y;
+  wire [BITS*SZ*SZ-1:0] risk_reg_view;
+  risk #(SZ, LOGCNT, BITS) ri (
+    .clk (clk),
+    .risk_func (risk_func),
+    .risk_reg (risk_reg),
+    .risk_addr (risk_addr),
+    .risk_stride_x (risk_stride_x),
+    .risk_stride_y (risk_stride_y),
+    .reg_view (risk_reg_view)
+  );*/
 
   integer i;
   always @(posedge clk) begin
@@ -215,6 +224,7 @@ module twitchcore (
 
     alu_func <= 3'b000;
     alu_left <= vs1;
+    alu_alt <= 1'b0;
     update_pc <= 2'b00;
     reg_writeback <= 1'b0;
     do_load <= 1'b0;
@@ -260,13 +270,37 @@ module twitchcore (
       7'b0010011: begin // IMM
         alu_imm <= imm_i;
         alu_func <= funct3;
+        alu_alt <= (funct7 == 7'b0100000 && funct3 == 3'b101);
         reg_writeback <= 1'b1;
       end
       7'b0110011: begin // OP
         alu_imm <= regs[rs2];
         alu_func <= funct3;
+        alu_alt <= (funct7 == 7'b0100000);
         reg_writeback <= 1'b1;
       end
+
+      /*7'b1111111: begin // RISK
+        risk_func <= funct3;
+        risk_addr <= regs[rs1];
+        risk_stride_x <= regs[rs2][31:16];
+        risk_stride_y <= regs[rs2][15:0];
+        risk_reg <= i_data[11:7];
+        // 9 DWORDs
+        case (funct7) 
+          7'b0000000: alu_imm <= risk_reg_view[31:0];
+          7'b0000001: alu_imm <= risk_reg_view[63:32];
+          7'b0000010: alu_imm <= risk_reg_view[95:64];
+          7'b0000011: alu_imm <= risk_reg_view[127:96];
+          7'b0000100: alu_imm <= risk_reg_view[159:128];
+          7'b0000101: alu_imm <= risk_reg_view[191:160];
+          7'b0000110: alu_imm <= risk_reg_view[223:192];
+          7'b0000111: alu_imm <= risk_reg_view[255:224];
+          7'b0001000: alu_imm <= risk_reg_view[288:256];
+        endcase
+        alu_left <= 32'b0;
+        reg_writeback <= 1'b1;
+      end*/
 
       7'b1110011: begin // SYSTEM
         trap <= regs[3] > 0;
@@ -308,5 +342,3 @@ module twitchcore (
   end
 
 endmodule
-
-
