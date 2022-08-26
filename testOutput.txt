@@ -1,0 +1,52 @@
+programming the mem
+Using D:/Projects/MajorProject/test.bin as firmware
+WARNING: testbench.sv:29: $readmemh(D:/Projects/MajorProject/test.bin): Not enough words in the file for the requested range [0:4095].
+doing work  0
+VCD info: dumpfile waves.vcd opened for output.
+1000000: 00a50513 0 pc:80000000 -- opcode:0010011 -- func:0 alt:0 left:00000000 imm:0000000a pend:0000000a d_addr:000a d_data:xxxxxxxx c.rs1:0a c.rs2:0a c.rd:0a
+regs[10]: 0
+regs[11]: 0
+regs[12]: 0
+regs[13]: 0
+regs[14]: 0
+regs[15]: 0
+regs[16]: 0
+regs[17]: 0
+1000000: 00a58593 0 pc:80000004 -- opcode:0010011 -- func:0 alt:0 left:00000000 imm:0000000a pend:0000000a d_addr:000a d_data:000000b5 c.rs1:0b c.rs2:0a c.rd:0b
+regs[10]:10
+regs[11]: 0
+regs[12]: 0
+regs[13]: 0
+regs[14]: 0
+regs[15]: 0
+regs[16]: 0
+regs[17]: 0
+1000000: 00b50633 0 pc:80000008 -- opcode:0110011 -- func:0 alt:0 left:0000000a imm:0000000a pend:00000014 d_addr:0014 d_data:000000b5 c.rs1:0a c.rs2:0b c.rd:0c
+regs[10]:10
+regs[11]:10
+regs[12]: 0
+regs[13]: 0
+regs[14]: 0
+regs[15]: 0
+regs[16]: 0
+regs[17]: 0
+1000000: 40b606b3 0 pc:8000000c -- opcode:0110011 -- func:0 alt:1 left:00000014 imm:0000000a pend:0000000a d_addr:000a d_data:xxxxxxxx c.rs1:0c c.rs2:0b c.rd:0d
+regs[10]:10
+regs[11]:10
+regs[12]:20
+regs[13]: 0
+regs[14]: 0
+regs[15]: 0
+regs[16]: 0
+regs[17]: 0
+1000000: xxxxxxxx 0 pc:80000010 -- opcode:xxxxxxx -- func:0 alt:0 left:xxxxxxxx imm:0000000a pend:xxxxxxxx d_addr:xxxx d_data:000000b5 c.rs1:xx c.rs2:xx c.rd:xx
+regs[10]:10
+regs[11]:10
+regs[12]:20
+regs[13]:10
+regs[14]: 0
+regs[15]: 0
+regs[16]: 0
+regs[17]: 0
+no more work  40
+testbench.sv:64: $finish called at 400 (1s)

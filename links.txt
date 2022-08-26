@@ -1,0 +1,4 @@
+ASM: https://riscvasm.lucasteske.dev/#
+INTPR: https://www.cs.cornell.edu/courses/cs3410/2019sp/riscv/interpreter/#
+CONV: https://www.rapidtables.com/convert/number/binary-to-hex.html
+RISC-CARD: https://github.com/jameslzhu/riscv-card/blob/master/riscv-card.pdf
